@@ -7,22 +7,33 @@
 <style>
   body {
     margin: 0;
-    overflow: hidden;
     background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
+
+  /* 固定比例容器，保持图片比例 */
   .scene {
     position: relative;
-    width: 100vw;
-    height: 100vh;
-    background: url('quanmian.jpg') no-repeat center center;
-    background-size: cover;
+    width: 90vw;
+    max-width: 1600px;
+    aspect-ratio: 16/9; /* 根据你的背景比例修改 */
+    overflow: hidden;
+  }
+
+  .scene img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
   }
 
   /* 闪光触发点 */
   .hotspot {
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255,255,200,1) 0%, rgba(255,255,200,0.1) 80%);
     box-shadow: 0 0 20px 5px rgba(255,255,150,0.8);
@@ -72,13 +83,14 @@
 </head>
 <body>
 <div class="scene" id="scene">
+  <img src="quanmian.jpg" alt="全图">
   <!-- 触发点们 -->
-  <div class="hotspot" style="top:65%; left:70%;" data-dialog="1"></div>
-  <div class="hotspot" style="top:50%; left:45%;" data-dialog="2"></div>
-  <div class="hotspot" style="top:55%; left:60%;" data-dialog="3"></div>
-  <div class="hotspot" style="top:23%; left:13%;" data-dialog="4"></div>
+  <div class="hotspot" style="top:45%; left:85%;" data-dialog="1"></div>
+  <div class="hotspot" style="top:50%; left:35%;" data-dialog="2"></div>
+  <div class="hotspot" style="top:65%; left:57%;" data-dialog="3"></div>
+  <div class="hotspot" style="top:23%; left:20%;" data-dialog="4"></div>
   <div class="hotspot" style="top:80%; left:25%;" data-dialog="5"></div>
-  <div class="hotspot" style="top:70%; left:50%;" data-dialog="6"></div>
+  <div class="hotspot" style="top:70%; left:75%;" data-dialog="6"></div>
 </div>
 
 <script>
@@ -113,21 +125,36 @@ scene.addEventListener("click", (e) => {
     const dialogId = e.target.getAttribute("data-dialog");
     showDialogs(dialogs[dialogId], e.target);
   } else {
-    // 点击空白处关闭所有弹窗
     document.querySelectorAll(".dialog").forEach(d => d.remove());
   }
 });
 
 function showDialogs(dialogArray, hotspot) {
   document.querySelectorAll(".dialog").forEach(d => d.remove());
+  
+  const rect = hotspot.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
   dialogArray.forEach((d, i) => {
     const dialog = document.createElement("div");
     dialog.className = "dialog";
     dialog.innerHTML = `<img src="${d.img}"><p>${d.text}</p>`;
     document.body.appendChild(dialog);
-    const rect = hotspot.getBoundingClientRect();
-    dialog.style.left = `${rect.left + 40}px`;
-    dialog.style.top = `${rect.top - 50 + i * 90}px`;
+
+    let left = rect.left + 40;
+    let top = rect.top - 50 + i * 90;
+
+    if (rect.left > viewportWidth * 0.7) {
+      left = rect.left - dialog.offsetWidth - 40;
+    }
+    if (top < 10) top = 10;
+    if (top + dialog.offsetHeight > viewportHeight) {
+      top = viewportHeight - dialog.offsetHeight - 10;
+    }
+
+    dialog.style.left = `${left}px`;
+    dialog.style.top = `${top}px`;
   });
 }
 </script>
