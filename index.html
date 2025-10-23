@@ -79,6 +79,36 @@
     from { opacity: 0; transform: scale(0.9); }
     to { opacity: 1; transform: scale(1); }
   }
+/* ✅ 让整体内容随屏幕宽度缩放 */
+.scene {
+  transform-origin: top center;
+  transition: transform 0.3s ease;
+}
+
+/* 手机端适配 */
+@media (max-width: 768px) {
+  .scene {
+    transform: scale(0.8); /* 缩小到 80% */
+  }
+}
+
+/* 更小屏幕（比如手机竖屏） */
+@media (max-width: 480px) {
+  .scene {
+    transform: scale(0.6); /* 再缩小一点 */
+  }
+
+  .dialog {
+    max-width: 240px;
+    font-size: 13px;
+  }
+
+  .dialog img {
+    width: 45px;
+    height: 45px;
+  }
+}
+
 </style>
 </head>
 <body>
