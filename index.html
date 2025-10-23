@@ -30,22 +30,42 @@
   }
 
   /* 闪光触发点 */
-  .hotspot {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,200,1) 0%, rgba(255,255,200,0.1) 80%);
-    box-shadow: 0 0 20px 5px rgba(255,255,150,0.8);
-    cursor: pointer;
-    animation: pulse 1.5s infinite;
-  }
+ /* 触发点基础样式 */
+.hotspot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,200,1) 0%, rgba(255,255,200,0.1) 80%);
+  box-shadow: 0 0 20px 5px rgba(255,255,150,0.8);
+  cursor: pointer;
+  animation: pulse 1.5s infinite;
+  /* 新增：放大点击区域但保持外观 */
+  transform: translate(-50%, -50%);
+}
+.hotspot::before {
+  content: "";
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 35px;   /* 实际可点区域 */
+  height: 35px;
+  border-radius: 50%;
+  background: transparent;
+}
 
-  @keyframes pulse {
-    0% { transform: scale(0.8); opacity: 0.7; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(0.8); opacity: 0.7; }
+/* 手机端放大触发点点击区域 */
+@media (max-width: 768px) {
+  .hotspot {
+    width: 14px;
+    height: 14px;
   }
+  .hotspot::before {
+    width: 50px;   /* 手指点击区域更大 */
+    height: 50px;
+  }
+}
+
 
   /* 对话框样式 */
   .dialog {
