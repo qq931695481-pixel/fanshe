@@ -1,284 +1,135 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>光的折射与全反射互动讲解</title>
-  <!-- 引入Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <style type="text/tailwindcss">
-    @layer utilities {
-      .content-auto {
-        content-visibility: auto;
-      }
-      .trigger-point {
-        position: absolute;
-        cursor: pointer;
-        z-index: 10;
-        opacity: 0; /* 完全隐藏触发点 */
-        transition: all 0.2s ease;
-      }
-      .trigger-point:hover {
-        background-color: rgba(255,255,255,0.1); /* 悬停时轻微反馈，但不明显 */
-      }
-      .popup-container {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: 50;
-      }
-      .popup-bubble {
-        position: absolute;
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        background: rgba(255, 255, 255, 0.97);
-        border-radius: 16px;
-        padding: 18px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-        max-width: 380px;
-        opacity: 0;
-        transform: scale(0.9) translateY(10px);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        pointer-events: auto;
-      }
-      .popup-bubble.show {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-      .character-img {
-        width: 85px;
-        height: 85px;
-        border-radius: 50%;
-        object-fit: cover;
-        flex-shrink: 0;
-        border: 3px solid white;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      }
-      .popup-text {
-        font-size: 16px;
-        line-height: 1.6;
-        color: #333;
-      }
-      .close-btn {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: rgba(0,0,0,0.05);
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 12px;
-        color: #666;
-        transition: all 0.2s ease;
-      }
-      .close-btn:hover {
-        background: rgba(0,0,0,0.1);
-        color: #333;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光的折射与反射</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #000;
+  }
+  .scene {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: url('quanmian.jpg') no-repeat center center;
+    background-size: cover;
+  }
+
+  /* 闪光触发点 */
+  .hotspot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,200,1) 0%, rgba(255,255,200,0.1) 80%);
+    box-shadow: 0 0 20px 5px rgba(255,255,150,0.8);
+    cursor: pointer;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(0.8); opacity: 0.7; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.8); opacity: 0.7; }
+  }
+
+  /* 对话框样式 */
+  .dialog {
+    position: absolute;
+    background: rgba(255,255,255,0.95);
+    border-radius: 15px;
+    padding: 10px 15px;
+    max-width: 300px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-family: "Microsoft YaHei", sans-serif;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .dialog img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: contain;
+  }
+
+  .dialog p {
+    margin: 0;
+    color: #333;
+    font-size: 15px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
 </head>
-<body class="overflow-hidden">
-  <!-- 主容器 -->
-  <div class="relative w-screen h-screen">
-    <!-- 背景图片 -->
-    <img src="quanmian.jpg" alt="光学现象图解" class="w-full h-full object-cover">
-    
-    <!-- 触发点区域 -->
-    <div class="absolute inset-0 w-full h-full">
-      <!-- 触发点一：观测点 -->
-      <div class="trigger-point" style="left: 82%; top: 42%; width: 100px; height: 30px;" data-trigger="1"></div>
-      
-      <!-- 触发点二：第一个折射 -->
-      <div class="trigger-point" style="left: 36%; top: 48%; width: 60px; height: 25px;" data-trigger="2-1"></div>
-      
-      <!-- 触发点二：第二个折射 -->
-      <div class="trigger-point" style="left: 78%; top: 54%; width: 60px; height: 25px;" data-trigger="2-2"></div>
-      
-      <!-- 触发点三：全反射 -->
-      <div class="trigger-point" style="left: 57%; top: 60%; width: 80px; height: 25px;" data-trigger="3"></div>
-      
-      <!-- 触发点四：云彩实际位置 -->
-      <div class="trigger-point" style="left: 18%; top: 18%; width: 140px; height: 30px;" data-trigger="4"></div>
-      
-      <!-- 触发点五：大脑想象云彩的位置 -->
-      <div class="trigger-point" style="left: 19%; top: 78%; width: 180px; height: 30px;" data-trigger="5"></div>
-    </div>
-    
-    <!-- 弹窗容器 -->
-    <div id="popup-container" class="popup-container"></div>
-  </div>
+<body>
+<div class="scene" id="scene">
+  <!-- 触发点们 -->
+  <div class="hotspot" style="top:65%; left:70%;" data-dialog="1"></div>
+  <div class="hotspot" style="top:50%; left:45%;" data-dialog="2"></div>
+  <div class="hotspot" style="top:55%; left:60%;" data-dialog="3"></div>
+  <div class="hotspot" style="top:23%; left:13%;" data-dialog="4"></div>
+  <div class="hotspot" style="top:80%; left:25%;" data-dialog="5"></div>
+  <div class="hotspot" style="top:70%; left:50%;" data-dialog="6"></div>
+</div>
 
-  <script>
-    // 角色弹窗数据
-    const popupData = {
-      // 触发点一：观测点
-      "1": [
-        {
-          img: "duoduo.png",
-          text: "我刚才明明看见这里有个大水洼！怎么一下子就不见了？",
-          position: { x: 70, y: 30 }
-        },
-        {
-          img: "caicai.png",
-          text: "多多你看！水洼到前面去了！",
-          position: { x: 80, y: 40 }
-        }
-      ],
-      
-      // 触发点二：第一个折射
-      "2-1": [
-        {
-          img: "duoduo.png",
-          text: "光从一种透明介质斜射入另一种透明介质时，传播方向一般会发生变化，这种现象叫光的折射。",
-          position: { x: 25, y: 40 }
-        },
-        {
-          img: "luoluo.png",
-          text: "我们在马路上因为折射关系发生弯曲，从而使我们看见更远处的水塘。",
-          position: { x: 40, y: 50 }
-        }
-      ],
-      
-      // 触发点二：第二个折射
-      "2-2": [
-        {
-          img: "duoduo.png",
-          text: "光从一种透明介质斜射入另一种透明介质时，传播方向一般会发生变化，这种现象叫光的折射。",
-          position: { x: 65, y: 45 }
-        },
-        {
-          img: "luoluo.png",
-          text: "我们在马路上因为折射关系发生弯曲，从而使我们看见更远处的水塘。",
-          position: { x: 75, y: 55 }
-        }
-      ],
-      
-      // 触发点三：全反射
-      "3": [
-        {
-          img: "caicai.png",
-          text: "光从光密介质射向光疏介质时，当入射角超过临界角后折射光消失、仅存反射光的物理现象。这种叫光的全反射。",
-          position: { x: 50, y: 65 }
-        }
-      ],
-      
-      // 触发点四：云彩实际位置
-      "4": [
-        {
-          img: "duoduo.png",
-          text: "原来云彩离我们那么远！",
-          position: { x: 20, y: 25 }
-        },
-        {
-          img: "luoluo.png",
-          text: "因为折射的关系，我们看见的位置离实际的位置还是有一定的距离的",
-          position: { x: 30, y: 35 }
-        }
-      ],
-      
-      // 触发点五：大脑想象云彩的位置
-      "5": [
-        {
-          img: "caicai.png",
-          text: "所以我们看见的也不一定是真的？",
-          position: { x: 25, y: 70 }
-        }
-      ]
-    };
+<script>
+const dialogs = {
+  1: [
+    { img: "duoduo.png", text: "我刚才明明看见这里有个大水洼！怎么一下子就不见了？" },
+    { img: "caicai.png", text: "多多你看！水洼到前面去了！" }
+  ],
+  2: [
+    { img: "duoduo.png", text: "光从一种透明介质斜射入另一种透明介质时，传播方向一般会发生变化，这种现象叫光的折射。" },
+    { img: "luoluo.png", text: "我们在马路上因为折射关系发生弯曲，从而使我们看见更远处的水塘。" }
+  ],
+  3: [
+    { img: "caicai.png", text: "光从光密介质射向光疏介质时，当入射角超过临界角后折射光消失、仅存反射光的物理现象。这种叫光的全反射。" }
+  ],
+  4: [
+    { img: "duoduo.png", text: "原来云彩离我们那么远！" }
+  ],
+  5: [
+    { img: "caicai.png", text: "所以我们看见的也不一定是真的？" }
+  ],
+  6: [
+    { img: "luoluo.png", text: "因为折射的关系，我们看见的位置离实际的位置还是有一定的距离的。" }
+  ]
+};
 
-    // 获取DOM元素
-    const triggerPoints = document.querySelectorAll('.trigger-point');
-    const popupContainer = document.getElementById('popup-container');
+const scene = document.getElementById("scene");
 
-    // 为所有触发点添加点击事件
-    triggerPoints.forEach(point => {
-      point.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const triggerKey = this.getAttribute('data-trigger');
-        showPopups(triggerKey);
-      });
-    });
-
+scene.addEventListener("click", (e) => {
+  if (e.target.classList.contains("hotspot")) {
+    e.stopPropagation();
+    const dialogId = e.target.getAttribute("data-dialog");
+    showDialogs(dialogs[dialogId], e.target);
+  } else {
     // 点击空白处关闭所有弹窗
-    document.addEventListener('click', function(e) {
-      if (e.target === popupContainer || e.target.tagName === 'IMG' && e.target.src.includes('quanmian.jpg')) {
-        closeAllPopups();
-      }
-    });
+    document.querySelectorAll(".dialog").forEach(d => d.remove());
+  }
+});
 
-    // 显示弹窗
-    function showPopups(triggerKey) {
-      // 先关闭所有现有弹窗
-      closeAllPopups();
-      
-      const popups = popupData[triggerKey];
-      if (!popups) return;
-      
-      // 创建并显示每个弹窗
-      popups.forEach((popup, index) => {
-        const popupEl = document.createElement('div');
-        popupEl.className = 'popup-bubble';
-        popupEl.style.left = `${popup.position.x}%`;
-        popupEl.style.top = `${popup.position.y}%`;
-        
-        // 设置弹窗内容
-        popupEl.innerHTML = `
-          <img src="${popup.img}" alt="角色图片" class="character-img">
-          <p class="popup-text">${popup.text}</p>
-          <button class="close-btn">&times;</button>
-        `;
-        
-        popupContainer.appendChild(popupEl);
-        
-        // 延迟显示，创建顺序动画效果
-        setTimeout(() => {
-          popupEl.classList.add('show');
-        }, index * 200);
-        
-        // 为关闭按钮添加事件
-        popupEl.querySelector('.close-btn').addEventListener('click', function() {
-          popupEl.classList.remove('show');
-          setTimeout(() => popupEl.remove(), 400);
-        });
-      });
-    }
-
-    // 关闭所有弹窗
-    function closeAllPopups() {
-      const popups = document.querySelectorAll('.popup-bubble');
-      popups.forEach(popup => {
-        popup.classList.remove('show');
-        setTimeout(() => popup.remove(), 400);
-      });
-    }
-
-    // 窗口大小变化时重新定位弹窗
-    window.addEventListener('resize', function() {
-      const visiblePopups = document.querySelectorAll('.popup-bubble.show');
-      if (visiblePopups.length > 0) {
-        // 记录当前显示的弹窗
-        const activeTrigger = Array.from(triggerPoints).find(point => {
-          const key = point.getAttribute('data-trigger');
-          return popupData[key] && popupData[key].length === visiblePopups.length;
-        });
-        
-        // 重新显示弹窗以适应新尺寸
-        if (activeTrigger) {
-          closeAllPopups();
-          setTimeout(() => {
-            showPopups(activeTrigger.getAttribute('data-trigger'));
-          }, 400);
-        }
-      }
-    });
-  </script>
+function showDialogs(dialogArray, hotspot) {
+  document.querySelectorAll(".dialog").forEach(d => d.remove());
+  dialogArray.forEach((d, i) => {
+    const dialog = document.createElement("div");
+    dialog.className = "dialog";
+    dialog.innerHTML = `<img src="${d.img}"><p>${d.text}</p>`;
+    document.body.appendChild(dialog);
+    const rect = hotspot.getBoundingClientRect();
+    dialog.style.left = `${rect.left + 40}px`;
+    dialog.style.top = `${rect.top - 50 + i * 90}px`;
+  });
+}
+</script>
 </body>
 </html>
